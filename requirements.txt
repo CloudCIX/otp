@@ -1,0 +1,2 @@
+# Libs specific to the otp application
+pyotp<=2.3.0
