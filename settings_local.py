@@ -1,18 +1,15 @@
 # Local settings that change on a per application / per environment basis
 import os
 
-PGSQLTOTP_PASSWORD = os.getenv('PGSQLTOTP_PASSWORD', 'pw')
-PGSQLTOTP_USER = os.getenv('PGSQLTOTP_USER', 'postgres')
-PGSQLTOTP_HOST = os.getenv('PGSQLTOTP_HOST', 'pgsqltotp')
 PGSQLAPI_PASSWORD = os.getenv('PGSQLAPI_PASSWORD', 'pw')
 PGSQLAPI_USER = os.getenv('PGSQLAPI_USER', 'postgres')
 PGSQLAPI_HOST = os.getenv('PGSQLAPI_HOST', 'pgsqlapi')
+PGSQLTOTP_PASSWORD = os.getenv('PGSQLTOTP_PASSWORD', 'pw')
+PGSQLTOTP_USER = os.getenv('PGSQLTOTP_USER', 'postgres')
+PGSQLTOTP_HOST = os.getenv('PGSQLTOTP_HOST', 'pgsqltotp')
 
 POD_NAME = os.getenv('POD_NAME', 'pod')
 ORGANIZATION_URL = os.getenv('ORGANIZATION_URL', 'example.com')
-
-PAM_NAME = os.getenv('PAM_NAME', 'pam')
-PAM_ORGANIZATION_URL = os.getenv('PAM_ORGANIZATION_URL', 'example.com')
 
 ALLOWED_HOSTS = (
     f'otp.{POD_NAME}.{ORGANIZATION_URL}',
@@ -46,17 +43,9 @@ DATABASE_ROUTERS = [
     'otp.db_router.OtpRouter',
 ]
 
-DEBUG = False
-
 INSTALLED_APPS = [
     'otp',
 ]
-
-# Small flag for whether or not this is a production deployment
-PRODUCTION_DEPLOYMENT = os.getenv('PRODUCTION_DEPLOYMENT', 'true').lower() == 'true'
-
-# Default is False
-TESTING = os.getenv('TESTING', 'false').lower() == 'true'
 
 # Localisation
 USE_I18N = False
@@ -65,38 +54,6 @@ USE_L10N = False
 ORG = ORGANIZATION_URL.split('.')[0]
 
 APPLICATION_NAME = os.getenv('APPLICATION_NAME', f'{POD_NAME}_{ORG}_otp')
-LOGSTASH_ENABLE = os.getenv('LOGSTASH_ENABLE', 'false').lower() == 'true'
-
-if f'{PAM_NAME}.{PAM_ORGANIZATION_URL}' == 'support.cloudcix.com' or LOGSTASH_ENABLE:
-    CLOUDCIX_INFLUX_TAGS = {
-        'service_name': APPLICATION_NAME,
-    }
-
-    # Tracing settings
-    TRACER_CONFIG = {
-        'logging': True,
-        'sampler': {
-            'type': 'probabilistic',
-            'param': 1,
-        },
-        'local_agent': {
-            'reporting_host': 'jaeger-agent',
-        },
-    }
-
-    RAVEN_CONFIG = {
-        'dsn': os.getenv('SENTRY_URL', None),
-        'string_max_length': 100000,
-        'processors': (
-            'raven.processors.SanitizePasswordsProcessor',
-        ),
-        'release': 'stable',
-    }
-else:
-    TRACER_CONFIG = {
-        'logging': False,
-        'sampler': {
-            'type': 'const',
-            'param': 0,
-        },
-    }
+CLOUDCIX_INFLUX_TAGS = {
+    'service_name': APPLICATION_NAME,
+}
